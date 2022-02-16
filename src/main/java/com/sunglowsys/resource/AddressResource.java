@@ -1,46 +1,75 @@
 package com.sunglowsys.resource;
 
 import com.sunglowsys.domain.Address;
+import com.sunglowsys.resource.util.BadRequestException;
 import com.sunglowsys.service.AddressService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
 @RequestMapping("/api/addresses")
 public class AddressResource {
-    @Autowired
-    private AddressService addressService;
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createAddress(@RequestBody Address address){
-        Address result = addressService.createAddrerss(address);
-        return ResponseEntity.ok().body("Address is created successfully: " + result);
+    private final Logger log = LoggerFactory.getLogger(AddressResource.class);
+
+    private final AddressService addressService;
+
+    public AddressResource(AddressService addressService) {
+        this.addressService = addressService;
     }
 
-    @GetMapping("/find_all_addresses")
-    public List<Address> getAll(){
-        List<Address> result1 = addressService.findAll();
-        return result1;
+    @PostMapping("/addresses")
+    public ResponseEntity<?> createAddress(@RequestBody Address address) throws URISyntaxException {
+        log.debug("REST request to create Addresses : {}",address);
+        if (address.getId() != null){
+            throw new BadRequestException("Id should be null in create api call");
+        }
+        Address result = addressService.create(address);
+        return ResponseEntity
+                .ok()
+                .body(result);
     }
 
-    @GetMapping("find_address/{id}")
-    public Address getById(@PathVariable("id") Integer id){
-        return addressService.findById(id);
+    @GetMapping("/address")
+    public ResponseEntity<List<Address>> getAllAddresses(Pageable pageable){
+        log.debug("REST request to getAll Addresses : {}", pageable.toString());
+        Page<Address> result = addressService.findAll(pageable);
+        return ResponseEntity
+                .ok()
+                .body(result.getContent());
+    }
+
+    @GetMapping("address/{id}")
+    public ResponseEntity<Address> getAddressById(@PathVariable("id") Long id){
+        log.debug("REST request to get Address : {}",id);
+        Optional<Address>result = addressService.findById(id);
+        return ResponseEntity
+                .ok()
+                .body(result.get());
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@RequestBody Address address, @PathVariable("id") Integer id){
-        addressService.update(address, id);
-        return ResponseEntity.ok().body("Address is updated successfully: " + id);
+    public ResponseEntity<?> updateAddress(@RequestBody Address address, @PathVariable("id") Long id){
+        log.debug("REST request to update Address : {}", id);
+        Address result = addressService.update(address,id);
+        return ResponseEntity.ok().body(result);
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Integer id){
+    public ResponseEntity<?> deleteAddress(@PathVariable("id") Long id){
+        log.debug("REST request to delete Address : {}", id);
         addressService.delete(id);
-        return ResponseEntity.ok().body("Address is successfully Deleted on this ID: " + id);
+        return ResponseEntity
+                .ok()
+                .build();
     }
 }

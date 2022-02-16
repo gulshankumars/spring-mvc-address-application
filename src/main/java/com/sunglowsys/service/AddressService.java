@@ -1,15 +1,20 @@
 package com.sunglowsys.service;
 
 import com.sunglowsys.domain.Address;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface AddressService {
-    Address createAddrerss(Address address);
 
-    Address update(Address address, Integer id);
+    Address create(Address address);
 
-    List<Address> findAll();
-    Address findById(Integer id);
-    void delete(Integer id);
+    Address update(Address address, Long id);
+
+    Page<Address> findAll(Pageable pageable);
+
+    Optional<Address> findById(Long id);
+
+    void delete(Long id);
 }

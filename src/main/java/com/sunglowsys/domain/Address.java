@@ -9,7 +9,7 @@ public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id ;
+    private Long id ;
     private String addressLine1 ;
     private String addressLine2 ;
     private String city ;
@@ -21,7 +21,8 @@ public class Address {
         System.out.println("Address object is created :");
     }
 
-    public Address(String addressLine1, String addressLine2, String city, String state, String country, String zipcode) {
+    public Address(Long id, String addressLine1, String addressLine2, String city, String state, String country, String zipcode) {
+        this.id = id;
         this.addressLine1 = addressLine1;
         this.addressLine2 = addressLine2;
         this.city = city;
@@ -30,11 +31,11 @@ public class Address {
         this.zipcode = zipcode;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
